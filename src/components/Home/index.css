@@ -1,0 +1,20 @@
+.main-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 95vh;
+    padding: 20px;
+}
+.main-text-container{
+
+    text-align: center;
+}
+.main-image{
+    width: 250px;
+}
+.scroll-text
+{
+    align-self: start;
+    color: rgba(68, 64, 64, 0.527);
+}

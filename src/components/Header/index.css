@@ -1,0 +1,46 @@
+.header-container{
+    display: flex;
+    align-items: center;
+    padding-top: 20px;
+}
+.header-logo-container{
+
+    display: flex;
+    gap: 10px;
+}
+.header-icon{
+    width: 150px;
+}
+.header-icon-text{
+
+    font-weight: bold;
+}
+.header-navlins-container{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 4rem;
+}
+.header-link
+{
+    text-decoration: none;
+    color: rgb(0, 174, 255);
+}
+.header-link:hover{
+
+    font-weight: bold;
+    color: rgb(0, 104, 165);
+}
+.navlinks-hr{
+    display: none;
+}
+.header-link:hover .navlinks-hr 
+{
+    display: block;
+    color: rgb(0, 104, 165);
+}
+.pageTitle{
+    color: rgb(0, 104, 165);
+    text-align: center;
+    font-size: 50px;
+}

@@ -1,0 +1,15 @@
+.card-container{
+    border: 2px solid rgb(0,89,255);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.image{
+}
+.name{
+    font-weight: bold;
+    font-size: 25px;
+    margin: 0px;
+}
