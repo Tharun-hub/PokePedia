@@ -71,7 +71,7 @@ function Pokedex()
                     <select className='filter-type'>
                         <option>Type </option>
                         <option>Fire</option>
-                        <img src="assets/icons/down-arrow.png"/>
+                        <img src="src/assets/icons/down-arrow.png"/>
                     </select>
                 </div>
                 <div className='catalogue-container'>

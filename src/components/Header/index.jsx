@@ -10,7 +10,7 @@ function Header()
         <>
             <div className="header-container">
                 <div className="header-logo-container">
-                    <img className='header-icon' src="public\assets\icons\pokemon-23.svg"/>
+                    <img className='header-icon' src="src\assets\icons\pokemon-23.svg"/>
                 </div>
                 <nav className="header-navlins-container">
                     <Link to={"/"} className="header-link">Home<hr className='navlinks-hr'></hr></Link>
