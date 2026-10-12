@@ -1,5 +1,5 @@
 import './index.css'
-
+import GreninjaImage  from '../../assets/images/greninja.png'
 function Home()
 {
     return (
@@ -10,7 +10,7 @@ function Home()
                 <p>Discover, compare, and learn about every Pokémon across every generation.</p>
             </div>
             <div className="main-image-container">
-                <img className="main-image" src= "src/assets/images/greninja.png" />
+                <img className="main-image" src= {GreninjaImage}/>
             </div>
         </div>
         

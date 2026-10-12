@@ -2,6 +2,7 @@ import './index.css'
 import { Link } from 'react-router'
 import pageContext from '../../context/pageContext'
 import { use } from 'react'
+import HeaderIconImage  from '../../assets/icons/pokemon-23.svg'
 function Header()
 {
     const pageContextValue = use(pageContext);
@@ -10,7 +11,7 @@ function Header()
         <>
             <div className="header-container">
                 <div className="header-logo-container">
-                    <img className='header-icon' src="src/assets/icons/pokemon-23.svg"/>
+                    <img className='header-icon' src= {HeaderIconImage}/>
                 </div>
                 <nav className="header-navlins-container">
                     <Link to={"/"} className="header-link">Home<hr className='navlinks-hr'></hr></Link>
