@@ -3,6 +3,7 @@ import Home from './components/Home'
 import Header from './components/Header'
 import Pokedex from './components/Pokedex'
 import './App.css'
+import CatalogueItemDetail from './components/catalogueItemDetail'
 function App(){
   return(
     
@@ -11,6 +12,7 @@ function App(){
     <Routes>
       <Route  path='/' element={<Home />}/>
       <Route path='/pokedex' element={<Pokedex />}></Route>
+      <Route path='pokedex/:id' element={<CatalogueItemDetail />}></Route>
     </Routes>
     </BrowserRouter>
   )

@@ -1,31 +1,41 @@
 import { useEffect, useState} from 'react'
 import './index.css'
 import PokemonCatalogueItem from '../PokemonCatalogueItem';
+
+
+
+
 function Pokedex()
 {
     const [searchInput, setSearchInput] = useState("");
+    const [showSearchData, setShowSearchData] = useState(false);
     const [pokemonDataList, setPokemonDataList] = useState([]);
-    let apiUrl = `https://pokeapi.co/api/v2/pokemon/${searchInput}`
+    
+    const [currentPage, setCurrentPage] = useState(1);
+    
     function getSearchInput(event)
     {
+        if(event.target.value==="") setShowSearchData(false)
         setSearchInput(event.target.value)
     }
     
     function onFormSubmit(event)
     {
         event.preventDefault();
+
         if(searchInput === "")
         {
             console.log("No input");
+            setShowSearchData(false);
         }
         else
         {
-            getData();
+            setShowSearchData(true);
         }
         console.log(searchInput)
     }
 
-    async function getData()
+    /* async function getData()
     {
         const response = await fetch(apiUrl);
         const responseData = await response.json();
@@ -37,27 +47,53 @@ function Pokedex()
         {
             onSubmitSuccess(responseData)
         }
-    }
-    function onSubmitSuccess(data)
+    } */
+    /* function onSubmitSuccess(data)
     {
-        console.log(data,"success");
+        setShowSearchData(true);
+        RenderSearchPokemonItem(data);
     }
     function onSubmitFailure(error)
     {
+        setShowSearchData(false);
         console.log(error.message)
-    }
-    async function GetCatalogueData()
+    } */
+    
+    function RenderCatalogue()
     {
-        const apiUrl = "https://pokeapi.co/api/v2/pokemon?limit=24&offset=0"
-        const response = await fetch(apiUrl);
-        const responseData = await response.json();
-        const pokemonList= responseData.results;
-        setPokemonDataList(pokemonList);
+        return (
+            pokemonDataList.map((index)=><PokemonCatalogueItem name={index.name} />)
+        )
     }
-
+    
+    function NextPage()
+    {
+        setCurrentPage(page => page+1)
+    }
+    function PreviousPage()
+    {
+        if(currentPage>1)
+        {
+            setCurrentPage(page=> page-1);
+        }
+    }
+    
     useEffect(()=>{
-        GetCatalogueData();
-    })
+        async function GetCatalogueData()
+        {
+            const apiUrl = `https://pokeapi.co/api/v2/pokemon?limit=24&offset=${getPageOffset()}`
+            const response = await fetch(apiUrl);
+            const responseData = await response.json();
+            const pokemonList= responseData.results;
+            return pokemonList;
+        }
+        function getPageOffset()
+        {
+            return (currentPage-1) * 24;
+        }
+        GetCatalogueData().then(data => setPokemonDataList(data));
+    },[currentPage])
+    
     return (
         <div>
             <form onSubmit={onFormSubmit} className='input-form'>
@@ -74,11 +110,13 @@ function Pokedex()
                         <img src="src/assets/icons/down-arrow.png"/>
                     </select>
                 </div>
-                <div className='catalogue-container'>
-                    {
-                        pokemonDataList.map((index)=><PokemonCatalogueItem name={index.name} url ={index.url}/>)
-                    }
-                </div>
+                <ul className='catalogue-container'>
+                    {showSearchData? <PokemonCatalogueItem name={searchInput}/>: RenderCatalogue()}
+                </ul>
+            </div>
+            <div>
+                <button onClick={PreviousPage}>-</button>
+                <button onClick={NextPage}>+</button>
             </div>
         </div>
     )

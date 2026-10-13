@@ -1,3 +1,6 @@
+.link-item{
+    text-decoration: none;
+}
 .card-container{
     border: 2px solid rgb(0,89,255);
     border-radius: 10px;
@@ -12,4 +15,8 @@
     font-weight: bold;
     font-size: 25px;
     margin: 0px;
+    color: rgb(0, 40, 114);
+}
+.card-id{
+    color: rgb(0, 40, 114);
 }
