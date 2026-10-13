@@ -3,7 +3,7 @@ import Home from './components/Home'
 import Header from './components/Header'
 import Pokedex from './components/Pokedex'
 import './App.css'
-import CatalogueItemDetail from './components/catalogueItemDetail'
+import CatalogueItemDetail from './components/CatalogueItemDetail'
 function App(){
   return(
     
