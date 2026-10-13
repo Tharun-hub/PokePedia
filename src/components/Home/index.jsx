@@ -1,7 +1,9 @@
 import './index.css'
 import GreninjaImage  from '../../assets/images/greninja.png'
+
 function Home()
 {
+
     return (
     <div>
         <div className="main-container">

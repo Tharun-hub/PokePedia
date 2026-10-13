@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import './index.css'
 import { Link } from 'react-router';
-
+import { CircleLoader } from 'react-spinners';
 function PokemonCatalogueItem(props)
 {
     const {name} = props
     const [pokemonDetails, setPokemonDetails] = useState({})
+    const [loading,setLoading] = useState(true);
     const url = `https://pokeapi.co/api/v2/pokemon/${name}`
     async function getData()
     {
@@ -27,16 +28,28 @@ function PokemonCatalogueItem(props)
         }
         
     }
-    useEffect(()=>{
-        getData().then(data=>setPokemonDetails(data))
-    },[url])
-    return(
-        <Link to={`/pokedex/${pokemonDetails.id}` }className="link-item">
+    function renderItem()
+    {
+        return (
             <li className='card-container'>
                 <img className='image' src={pokemonDetails.frontDefaultImg}/>
                 <p className='name'>{name[0].toUpperCase() + name.slice(1)}</p>
                 <p className='card-id'># {pokemonDetails.id}</p>
+                <div className='card-pokemon-type-container'>
+                    {pokemonDetails.type.map(t => {return <p>{t.type.name[0].toUpperCase()+t.type.name.slice(1)}</p>})}
+                </div>
+                
             </li>
+        )
+    }
+    useEffect(()=>{
+        
+        getData().then(data=>setPokemonDetails(data)).catch(err=>console.log(err)).finally(()=>setLoading(false));
+    },[url])
+    return(
+        <Link to={`/pokedex/${pokemonDetails.id}` }className="link-item">
+            {loading && <CircleLoader color='black'></CircleLoader>}
+            {!loading && renderItem()}
         </Link>
     )
 }

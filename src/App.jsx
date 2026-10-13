@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Pokedex from './components/Pokedex'
 import './App.css'
 import CatalogueItemDetail from './components/CatalogueItemDetail'
+import Footer from './components/Footer'
 function App(){
   return(
     
@@ -14,6 +15,7 @@ function App(){
       <Route path='/pokedex' element={<Pokedex />}></Route>
       <Route path='pokedex/:id' element={<CatalogueItemDetail />}></Route>
     </Routes>
+    <Footer/>
     </BrowserRouter>
   )
 }
