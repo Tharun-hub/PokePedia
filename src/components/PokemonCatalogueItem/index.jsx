@@ -36,7 +36,7 @@ function PokemonCatalogueItem(props)
                 <p className='name'>{name[0].toUpperCase() + name.slice(1)}</p>
                 <p className='card-id'># {pokemonDetails.id}</p>
                 <div className='card-pokemon-type-container'>
-                    {pokemonDetails.type.map(t => {return <p>{t.type.name[0].toUpperCase()+t.type.name.slice(1)}</p>})}
+                    {pokemonDetails.type.map(t => {return <p className={`type-badge type-${t.type.name}`}>{t.type.name[0].toUpperCase()+t.type.name.slice(1)}</p>})}
                 </div>
                 
             </li>

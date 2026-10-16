@@ -113,8 +113,8 @@ function Pokedex()
             <div className='pokedex-container'>
                 <div className='filter'>
                     <select className='filter-type'>
-                        <option>Type </option>
-                        <option>Fire</option>
+                        <option className='filter-type-option'>Type </option>
+                        <option className='filter-type-option'>Fire</option>
                         <img src="src/assets/icons/down-arrow.png"/>
                     </select>
                 </div>
@@ -122,11 +122,12 @@ function Pokedex()
                     {loading && <BarLoader color='black'></BarLoader>}
                     {!loading && showSearchData? <PokemonCatalogueItem name={searchInput}/>: RenderCatalogue()}
                 </ul>
+                <div className='page-scroll-button-container'>
+                    <button className='page-scroll-button left' onClick={PreviousPage}>Previous Page</button>
+                    <button className='page-scroll-button right' onClick={NextPage}>Next Page</button>
+                </div>
             </div>
-            <div>
-                <button onClick={PreviousPage}>-</button>
-                <button onClick={NextPage}>+</button>
-            </div>
+            
         </div>
     )
 }

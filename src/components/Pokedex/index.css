@@ -21,7 +21,8 @@
     font-weight: bold
 }
 .pokedex-container{
-    display: flex;
+    display: grid;
+    grid-template-columns: 0.5fr 2fr;
     gap: 80px;
 }
 .filter{
@@ -38,10 +39,36 @@
     font-weight: bold;
 
 }
+.filter-type-option{
+    border: 2px solid rgb(0, 89, 255);
+    padding: 14px;
+}
 .catalogue-container{
     display: grid;
     gap: 20px;
     flex: 1;
     min-width: 0;
     grid-template-columns: repeat(3, minmax(0, 0.5fr));
+}
+.page-scroll-button-container{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    display: flex;
+    gap: 10px;
+}
+.page-scroll-button{
+    padding: 10px;
+    padding: 10px 20px 10px 20px;
+    border: 0px;
+    
+    background-color: rgb(0, 89, 255);
+    color: white;
+}
+.left{
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
+}
+.right{
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
 }
