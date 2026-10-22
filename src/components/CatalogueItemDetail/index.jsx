@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import "./index.css";
 import { useParams } from "react-router";
-
+import NotFound from "../NotFound";
 function CatalogueItemDetail() {
   const { id } = useParams();
 
   const [pokemonData, setPokemonData] = useState(null);
   const [speciesData, setSpeciesData] = useState(null);
+  const [notFoundId, setNotFoundId] = useState(null);
   const [weaknessData, setWeaknessData] = useState([]);
   const [evolutionData, setEvolutionData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -105,6 +106,7 @@ function CatalogueItemDetail() {
         setEvolutionData(evolutions);
       } catch (error) {
         console.log(error);
+        setNotFoundId(id);
       } finally {
         setLoading(false);
       }
@@ -116,7 +118,10 @@ function CatalogueItemDetail() {
   if (loading) {
     return <p>Loading...</p>;
   }
-
+  if(notFoundId=== id)
+  {
+    return <NotFound />
+  }
   if (!pokemonData || !speciesData) {
     return <p>Could not find this Pokémon.</p>;
   }
