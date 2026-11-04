@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import './index.css';
-
+import Card from "../Card";
 /* import BigEyesBoy from 'https://framer.com/m/bigeyesboy-dmg7AQ.js@oExbahf49SXtqbWwdsWx'; */
 
 function NotFound()
@@ -9,6 +9,7 @@ function NotFound()
         <div className="not-found-page">
             <div className="not-found-visual">
                 {/* <BigEyesBoy /> */}
+                <Card />
             </div>
 
             <h1>Oops! Page not found</h1>

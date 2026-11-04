@@ -1,26 +1,25 @@
 import './index.css'
-import { Link } from 'react-router'
-import pageContext from '../../context/pageContext'
-import { use } from 'react'
+import { NavLink, useLocation } from 'react-router'
 import HeaderIconImage  from '../../assets/icons/pokemon-23.svg'
 function Header()
 {
-    const pageContextValue = use(pageContext);
-    const {page} = pageContextValue;
+    const { pathname } = useLocation();
+    const page = pathname.startsWith('/pokedex') ? 'Pokédex' : pathname === '/' ? 'Discover Pokémon' : 'Page not found';
+
     return (
-        <>
+        <header className="site-header">
             <div className="header-container">
-                <div className="header-logo-container">
-                    <img className='header-icon' src= {HeaderIconImage}/>
-                </div>
-                <nav className="header-navlins-container">
-                    <Link to={"/"} className="header-link">Home<hr className='navlinks-hr'></hr></Link>
-                    <Link to={"/pokedex"} className="header-link">Pokédex<hr className='navlinks-hr'></hr></Link>
-                    <Link to={"/about"} className="header-link">About<hr className='navlinks-hr'></hr></Link>
+                <NavLink to="/" className="header-logo-container" aria-label="Poképedia home">
+                    <img className='header-icon' src={HeaderIconImage} alt="Poképedia"/>
+                    <span>Poképedia</span>
+                </NavLink>
+                <nav className="header-navlinks-container" aria-label="Main navigation">
+                    <NavLink to="/" end className="header-link">Home</NavLink>
+                    <NavLink to="/pokedex" className="header-link">Pokédex</NavLink>
                 </nav>
             </div>
-            <h1 className='pageTitle'>{page}</h1>
-        </>
+            {pathname !== '/' && <p className='page-title'>{page}</p>}
+        </header>
     )
 }
 export default Header

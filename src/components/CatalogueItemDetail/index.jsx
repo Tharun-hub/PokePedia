@@ -12,107 +12,59 @@ function CatalogueItemDetail() {
   const [evolutionData, setEvolutionData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const pokemonDataUrl = `https://pokeapi.co/api/v2/pokemon/${id}`;
-  const speciesDataUrl = `https://pokeapi.co/api/v2/pokemon-species/${id}`;
-
-  async function getData(url) {
-    const response = await fetch(url);
-
-    if (response.ok) {
-      const responseData = await response.json();
-      return responseData;
-    } else {
-      throw new Error("No such pokemon");
-    }
-  }
-
-  async function getWeaknessData(types) {
-    const typeResponses = await Promise.all(
-      types.map((type) => getData(type.type.url)),
-    );
-
-    const weaknessMap = {};
-
-    typeResponses.forEach((typeData) => {
-      typeData.damage_relations.double_damage_from.forEach((type) => {
-        weaknessMap[type.name] = (weaknessMap[type.name] || 1) * 2;
-      });
-
-      typeData.damage_relations.half_damage_from.forEach((type) => {
-        weaknessMap[type.name] = (weaknessMap[type.name] || 1) * 0.5;
-      });
-
-      typeData.damage_relations.no_damage_from.forEach((type) => {
-        weaknessMap[type.name] = 0;
-      });
-    });
-
-    return Object.entries(weaknessMap)
-      .filter(([name, multiplier]) => multiplier > 1)
-      .map(([name, multiplier]) => ({
-        name,
-        multiplier,
-      }));
-  }
-
-  function getEvolutionSpecies(chain) {
-    const evolutionList = [];
-
-    function traverseEvolutionChain(evolution) {
-      evolutionList.push(evolution.species.name);
-
-      evolution.evolves_to.forEach((nextEvolution) => {
-        traverseEvolutionChain(nextEvolution);
-      });
-    }
-
-    traverseEvolutionChain(chain);
-
-    return evolutionList;
-  }
-
-  async function getEvolutionData(url) {
-    const evolutionChain = await getData(url);
-
-    const evolutionNames = getEvolutionSpecies(evolutionChain.chain);
-
-    const evolutionPokemon = await Promise.all(
-      evolutionNames.map((name) =>
-        getData(`https://pokeapi.co/api/v2/pokemon/${name}`),
-      ),
-    );
-
-    return evolutionPokemon;
-  }
-
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
+
+    async function getData(url) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("No such Pokémon");
+      return response.json();
+    }
+
+    async function getWeaknessData(types) {
+      const typeResponses = await Promise.all(types.map((type) => getData(type.type.url)));
+      const weaknessMap = {};
+      typeResponses.forEach((typeData) => {
+        typeData.damage_relations.double_damage_from.forEach((type) => { weaknessMap[type.name] = (weaknessMap[type.name] ?? 1) * 2; });
+        typeData.damage_relations.half_damage_from.forEach((type) => { weaknessMap[type.name] = (weaknessMap[type.name] ?? 1) * 0.5; });
+        typeData.damage_relations.no_damage_from.forEach((type) => { weaknessMap[type.name] = 0; });
+      });
+      return Object.entries(weaknessMap).filter(([, multiplier]) => multiplier > 1).map(([name, multiplier]) => ({ name, multiplier }));
+    }
+
+    function getEvolutionSpecies(chain) {
+      const evolutionList = [];
+      function traverse(evolution) { evolutionList.push(evolution.species.name); evolution.evolves_to.forEach(traverse); }
+      traverse(chain);
+      return evolutionList;
+    }
 
     async function fetchAllData() {
+      setLoading(true);
+      setNotFoundId(null);
       try {
         const [pokemon, species] = await Promise.all([
-          getData(pokemonDataUrl),
-          getData(speciesDataUrl),
+          getData(`https://pokeapi.co/api/v2/pokemon/${id}`),
+          getData(`https://pokeapi.co/api/v2/pokemon-species/${id}`),
         ]);
-
-        setPokemonData(pokemon);
-        setSpeciesData(species);
-
         const weaknesses = await getWeaknessData(pokemon.types);
-        setWeaknessData(weaknesses);
-
-        const evolutions = await getEvolutionData(species.evolution_chain.url);
-
-        setEvolutionData(evolutions);
-      } catch (error) {
-        console.log(error);
-        setNotFoundId(id);
+        const evolutionChain = await getData(species.evolution_chain.url);
+        const evolutions = await Promise.all(getEvolutionSpecies(evolutionChain.chain).map((name) => getData(`https://pokeapi.co/api/v2/pokemon/${name}`)));
+        if (!cancelled) {
+          setPokemonData(pokemon);
+          setSpeciesData(species);
+          setWeaknessData(weaknesses);
+          setEvolutionData(evolutions);
+        }
+      } catch {
+        if (!cancelled) setNotFoundId(id);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
     fetchAllData();
+    return () => { cancelled = true; };
   }, [id]);
 
   if (loading) {
@@ -210,7 +162,7 @@ function CatalogueItemDetail() {
     return evolutionData.map((pokemon, index) => (
       <div className="evolution-item" key={pokemon.id}>
         <div className="evolution-pokemon">
-          <img src={pokemon.sprites.other["official-artwork"].front_default} />
+          <img src={pokemon.sprites.other["official-artwork"].front_default} alt={pokemon.name} />
 
           <p>{pokemon.name}</p>
 
@@ -240,6 +192,7 @@ function CatalogueItemDetail() {
           <img
             className="pokemon-data-image"
             src={pokemonData.sprites.other["official-artwork"].front_default}
+            alt={pokemonData.name}
           />
 
           <div className="pokemon-data-details-container">

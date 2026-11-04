@@ -1,134 +1,114 @@
-import { useEffect, useState} from 'react'
-import './index.css'
+import { useEffect, useState } from 'react';
+import './index.css';
 import PokemonCatalogueItem from '../PokemonCatalogueItem';
 import { BarLoader } from 'react-spinners';
-function Pokedex()
-{
-    const [searchInput, setSearchInput] = useState("");
-    const [showSearchData, setShowSearchData] = useState(false);
+
+const PAGE_SIZE = 24;
+const TYPES = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+
+function Pokedex() {
+    const [searchInput, setSearchInput] = useState('');
+    const [submittedSearch, setSubmittedSearch] = useState('');
     const [pokemonDataList, setPokemonDataList] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+    const [error, setError] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    
-    function getSearchInput(event)
-    {
-        setShowSearchData(false)
-        
-        setSearchInput(event.target.value)
-    }
-    
-    function onFormSubmit(event)
-    {
+    const [selectedType, setSelectedType] = useState('all');
+    const [totalResults, setTotalResults] = useState(0);
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        async function getCatalogueData() {
+            setLoading(true);
+            setError('');
+            try {
+                if (selectedType === 'all') {
+                    const offset = (currentPage - 1) * PAGE_SIZE;
+                    const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${PAGE_SIZE}&offset=${offset}`, { signal: controller.signal });
+                    if (!response.ok) throw new Error('Could not load the Pokédex.');
+                    const data = await response.json();
+                    setPokemonDataList(data.results);
+                    setTotalResults(data.count);
+                } else {
+                    const response = await fetch(`https://pokeapi.co/api/v2/type/${selectedType}`, { signal: controller.signal });
+                    if (!response.ok) throw new Error('Could not load this type.');
+                    const data = await response.json();
+                    const results = data.pokemon.map(({ pokemon }) => pokemon);
+                    setTotalResults(results.length);
+                    setPokemonDataList(results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE));
+                }
+            } catch (requestError) {
+                if (requestError.name !== 'AbortError') {
+                    setError(requestError.message);
+                    setPokemonDataList([]);
+                }
+            } finally {
+                if (!controller.signal.aborted) setLoading(false);
+            }
+        }
+
+        getCatalogueData();
+        return () => controller.abort();
+    }, [currentPage, selectedType]);
+
+    function onFormSubmit(event) {
         event.preventDefault();
-        
-        if(searchInput === "")
-        {
-            console.log("No input");
-            setShowSearchData(false);
-        }
-        else
-        {
-            setShowSearchData(true);
-        }
-        console.log(searchInput)
+        setSubmittedSearch(searchInput.trim().toLowerCase());
     }
 
-    /* async function getData()
-    {
-        const response = await fetch(apiUrl);
-        const responseData = await response.json();
-        if(!response.ok)
-        {
-            onSubmitFailure(responseData)
-        }
-        else
-        {
-            onSubmitSuccess(responseData)
-        }
-    } */
-    /* function onSubmitSuccess(data)
-    {
-        setShowSearchData(true);
-        RenderSearchPokemonItem(data);
+    function onTypeChange(event) {
+        setSelectedType(event.target.value);
+        setCurrentPage(1);
+        setSubmittedSearch('');
     }
-    function onSubmitFailure(error)
-    {
-        setShowSearchData(false);
-        console.log(error.message)
-    } */
-    
-    function RenderCatalogue()
-    {
-        return (
-            pokemonDataList.map((index)=><PokemonCatalogueItem key={index.name} name={index.name} />)
-        )
-    }
-    
-    function NextPage()
-    {
-        setCurrentPage(page => page+1)
-        setPokemonDataList([]);
-        setLoading(true);
-    }
-    function PreviousPage()
-    {
-        if(currentPage>1)
-        {
-            setCurrentPage(page=> page-1);
-            setPokemonDataList([]);
-            setLoading(true);
-        }
-        
-    }
-    useEffect(()=>{
-        
-        async function GetCatalogueData()
-        {
-            const apiUrl = `https://pokeapi.co/api/v2/pokemon?limit=24&offset=${getPageOffset()}`
-            const response = await fetch(apiUrl);
-            const responseData = await response.json();
-            const pokemonList= responseData.results;
-            return pokemonList;
-        }
-        function getPageOffset()
-        {
-            return (currentPage-1) * 24;
-        }
-        
-        GetCatalogueData()
-        .then(data => setPokemonDataList(data))
-        .catch((err)=> console.log("couldnt fetch data", err))
-        .finally(()=>setLoading(false));
-    },[currentPage])
-    
+
+    const totalPages = Math.max(1, Math.ceil(totalResults / PAGE_SIZE));
+    const isSearchActive = Boolean(submittedSearch);
+
     return (
-        <div>
+        <section className='pokedex-page'>
+            <div className='pokedex-intro'>
+                <p>Browse the collection</p>
+                <span>Search by name or national Pokédex number, or filter by type.</span>
+            </div>
             <form onSubmit={onFormSubmit} className='input-form'>
-                <input onChange={getSearchInput} className='searchInput' type='text' placeholder='Enter Pokémon Name or ID'></input>
-                <div className='search-button-container'>
-                    <button className='search-button'>Seach</button>
-                </div>
+                <label className='visually-hidden' htmlFor='pokemon-search'>Search Pokémon</label>
+                <input id='pokemon-search' value={searchInput} onChange={(event) => setSearchInput(event.target.value)} className='search-input' type='search' placeholder='Search Pokémon by name or ID' />
+                <button className='search-button' type='submit'>Search</button>
             </form>
             <div className='pokedex-container'>
-                <div className='filter'>
-                    <select className='filter-type'>
-                        <option className='filter-type-option'>Type </option>
-                        <option className='filter-type-option'>Fire</option>
-                        <img src="src/assets/icons/down-arrow.png"/>
+                <aside className='filter'>
+                    <label htmlFor='type-filter'>Filter by type</label>
+                    <select id='type-filter' value={selectedType} onChange={onTypeChange} className='filter-type'>
+                        <option value='all'>All types</option>
+                        {TYPES.map((type) => <option value={type} key={type}>{type[0].toUpperCase() + type.slice(1)}</option>)}
                     </select>
-                </div>
-                <ul className='catalogue-container'>
-                    {loading && <BarLoader color='black'></BarLoader>}
-                    {!loading && showSearchData? <PokemonCatalogueItem name={searchInput}/>: RenderCatalogue()}
-                </ul>
-                <div className='page-scroll-button-container'>
-                    <button className='page-scroll-button left' onClick={PreviousPage}>Previous Page</button>
-                    <button className='page-scroll-button right' onClick={NextPage}>Next Page</button>
+                    <p>{isSearchActive ? 'Showing your search result' : `${totalResults.toLocaleString()} Pokémon found`}</p>
+                </aside>
+                <div className='catalogue-area'>
+                    {isSearchActive ? (
+                        <ul className='catalogue-container'><PokemonCatalogueItem name={submittedSearch} /></ul>
+                    ) : loading ? (
+                        <div className='loading-state'><BarLoader color='#2563eb' width={160} /><span>Loading Pokémon…</span></div>
+                    ) : error ? (
+                        <div className='message-state'>{error} Please try again.</div>
+                    ) : (
+                        <ul className='catalogue-container'>
+                            {pokemonDataList.map((pokemon) => <PokemonCatalogueItem key={pokemon.name} name={pokemon.name} />)}
+                        </ul>
+                    )}
+                    {!isSearchActive && !loading && !error && (
+                        <nav className='page-scroll-button-container' aria-label='Pokédex pages'>
+                            <button className='page-scroll-button' onClick={() => setCurrentPage((page) => page - 1)} disabled={currentPage === 1}>← Previous</button>
+                            <span>Page {currentPage} of {totalPages}</span>
+                            <button className='page-scroll-button' onClick={() => setCurrentPage((page) => page + 1)} disabled={currentPage === totalPages}>Next →</button>
+                        </nav>
+                    )}
                 </div>
             </div>
-            
-        </div>
-    )
+        </section>
+    );
 }
-export default Pokedex
+
+export default Pokedex;

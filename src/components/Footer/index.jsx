@@ -3,9 +3,9 @@ import './index.css'
 function Footer()
 {
     return(
-        <div className='footer-container'>
-            <p>This application was built using <a href='https://pokeapi.co/' target='_blank'>pokeapi</a></p>
-        </div>
+        <footer className='footer-container'>
+            <p>Data provided by <a href='https://pokeapi.co/' target='_blank' rel="noreferrer">PokéAPI</a></p>
+        </footer>
     )
 }
 
